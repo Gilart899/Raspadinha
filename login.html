@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login do Administrador</title>
+
+<style>
+
+body{
+
+margin:0;
+background:#101010;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+
+}
+
+.card{
+
+width:340px;
+background:#fff;
+padding:30px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,.5);
+
+}
+
+h1{
+
+color:#009944;
+margin-bottom:25px;
+
+}
+
+input{
+
+width:100%;
+padding:14px;
+margin-bottom:15px;
+font-size:16px;
+border-radius:10px;
+border:1px solid #CCC;
+
+}
+
+button{
+
+width:100%;
+padding:15px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#00b050;
+color:#fff;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#009944;
+
+}
+
+.erro{
+
+color:red;
+margin-top:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>🔒 Administração</h1>
+
+<input
+id="senha"
+type="password"
+placeholder="Digite a senha">
+
+<button onclick="entrar()">
+
+Entrar
+
+</button>
+
+<p id="erro" class="erro"></p>
+
+</div>
+
+<script>
+
+const SENHA="GilFest2026";
+
+function entrar(){
+
+let senha=document
+.getElementById("senha").value;
+
+if(senha===SENHA){
+
+localStorage.setItem("admin","ok");
+
+location.href="admin.html";
+
+}else{
+
+document
+.getElementById("erro")
+.innerHTML="Senha incorreta.";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
