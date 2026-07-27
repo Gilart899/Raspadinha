@@ -102,28 +102,7 @@ Entrar
 
 </div>
 
-<script>
-
-const SENHA="GilFest2026";
-
-function entrar(){
-
-let senha=document
-.getElementById("senha").value;
-
-if(senha===SENHA){
-
-localStorage.setItem("admin","ok");
-
-location.href="admin.html";
-
-}else{
-
-document
-.getElementById("erro")
-.innerHTML="Senha incorreta.";
-
-}
+<script src="login.js"></script>
 
 }
 
