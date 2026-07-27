@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel Administrativo</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+
+background:#121212;
+
+color:white;
+
+padding:20px;
+
+font-family:Arial;
+
+}
+
+.painel{
+
+max-width:900px;
+
+margin:auto;
+
+}
+
+.card{
+
+background:#1f1f1f;
+
+padding:20px;
+
+margin-bottom:20px;
+
+border-radius:15px;
+
+box-shadow:0 0 15px rgba(0,255,0,.2);
+
+}
+
+h1{
+
+text-align:center;
+
+margin-bottom:30px;
+
+}
+
+h2{
+
+color:#00ff88;
+
+margin-bottom:15px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid #333;
+
+text-align:left;
+
+}
+
+button{
+
+padding:12px 25px;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+background:#00b050;
+
+color:white;
+
+font-size:16px;
+
+margin-top:10px;
+
+}
+
+button:hover{
+
+background:#009944;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="painel">
+
+<h1>🎁 Painel da Raspadinha</h1>
+
+<div class="card">
+
+<h2>Participantes</h2>
+
+<h3 id="total">0</h3>
+
+</div>
+
+<div class="card">
+
+<h2>Prêmios</h2>
+
+<p>Ferro:
+<span id="ferro">
+Disponível
+</span></p>
+
+<p>Liquidificador:
+<span id="liquidificador">
+Disponível
+</span></p>
+
+</div>
+
+<div class="card">
+
+<h2>Vencedores</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Prêmio</th>
+
+<th>Telefone</th>
+
+<th>Data</th>
+
+</tr>
+
+</thead>
+
+<tbody id="lista">
+
+</tbody>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<button onclick="reiniciar()">
+
+Reiniciar Promoção
+
+</button>
+
+</div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+
+<script src="firebase.js"></script>
+
+<script src="admin.js"></script>
+
+</body>
+
+</html>
