@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Carregando...</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+
+background:linear-gradient(135deg,#0b7d2b,#18b34a);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+height:100vh;
+
+overflow:hidden;
+
+color:white;
+
+}
+
+.logo{
+
+text-align:center;
+
+animation:fade 2s infinite alternate;
+
+}
+
+.logo img{
+
+width:180px;
+
+margin-bottom:20px;
+
+}
+
+h1{
+
+font-size:34px;
+
+margin-bottom:15px;
+
+}
+
+p{
+
+font-size:18px;
+
+opacity:.9;
+
+}
+
+.loader{
+
+margin:30px auto;
+
+width:70px;
+
+height:70px;
+
+border:8px solid rgba(255,255,255,.3);
+
+border-top:8px solid white;
+
+border-radius:50%;
+
+animation:girar 1s linear infinite;
+
+}
+
+@keyframes girar{
+
+100%{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:.4;
+
+transform:scale(.96);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1.05);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="logo">
+
+<img src="img/logo.png">
+
+<h1>🍀 Raspadinha Premiada</h1>
+
+<div class="loader"></div>
+
+<p>Carregando...</p>
+
+</div>
+
+<script>
+
+setTimeout(()=>{
+
+location.href="index.html";
+
+},3000);
+
+</script>
+
+</body>
+
+</html>
