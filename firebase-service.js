@@ -1,102 +1,113 @@
-// ===============================
-// REFERÊNCIAS
-// ===============================
+/* ==========================================
+   FIREBASE SERVICE
+   GilFest - Raspadinha v2.0
+========================================== */
 
-const contadorRef = firebase.database().ref("contador");
-const participantesRef = firebase.database().ref("participantes");
-const premiosRef = firebase.database().ref("premios");
+const db = firebase.database();
 
-// ===============================
-// OBTER CONTADOR
-// ===============================
+// Referências
+const campanhaRef = db.ref("campanha");
+const participantesRef = db.ref("participantes");
+const vencedoresRef = db.ref("vencedores");
+const contadorRef = db.ref("contador");
 
-async function obterContador() {
-
-    const snap = await contadorRef.once("value");
-
-    if (!snap.exists()) {
-
-        await contadorRef.set({
-            total: 0
-        });
-
-        return 0;
-    }
-
-    return snap.val().total || 0;
-}
-
-// ===============================
-// INCREMENTAR CONTADOR
-// ===============================
-
-async function incrementarParticipante() {
-
-    const total = await obterContador();
-
-    const novoTotal = total + 1;
-
-    await contadorRef.set({
-        total: novoTotal
-    });
-
-    return novoTotal;
-}
-
-// ===============================
+// ==========================================
 // REGISTRAR PARTICIPANTE
-// ===============================
+// ==========================================
 
-async function registrarParticipante(id) {
+async function registrarParticipante(dados){
 
-    await participantesRef.child(id).set({
-
-        participou: true,
-
-        data: new Date().toISOString()
-
-    });
+    return participantesRef.push(dados);
 
 }
 
-// ===============================
-// VERIFICAR PARTICIPAÇÃO
-// ===============================
+// ==========================================
+// VERIFICAR TELEFONE
+// ==========================================
 
-async function jaParticipou(id) {
+async function telefoneJaExiste(telefone){
 
-    const snap = await participantesRef.child(id).once("value");
+    const snap = await participantesRef
+    .orderByChild("telefone")
+    .equalTo(telefone)
+    .once("value");
 
     return snap.exists();
 
 }
 
-// ===============================
-// LER PRÊMIOS
-// ===============================
+// ==========================================
+// CONTADOR
+// ==========================================
 
-async function lerPremios() {
+async function incrementarContador(){
 
-    const snap = await premiosRef.once("value");
+    return contadorRef.transaction(valor=>{
 
-    return snap.val();
+        return (valor || 0)+1;
+
+    });
 
 }
 
-// ===============================
-// ENTREGAR PRÊMIO
-// ===============================
+// ==========================================
+// TOTAL DE PARTICIPANTES
+// ==========================================
 
-async function entregarPremio(nome,id){
+async function totalParticipantes(){
 
-    await premiosRef.child(nome).update({
+    const snap = await contadorRef.once("value");
 
-        disponivel:false,
+    return snap.val() || 0;
 
-        vencedor:id,
+}
 
-        data:new Date().toISOString()
+// ==========================================
+// CAMPANHA
+// ==========================================
 
-    });
+async function campanhaAtiva(){
+
+    const snap = await campanhaRef.once("value");
+
+    if(!snap.exists()) return false;
+
+    return snap.val().ativa===true;
+
+}
+
+// ==========================================
+// OBTER VENCEDORES
+// ==========================================
+
+async function obterVencedores(){
+
+    const snap = await vencedoresRef.once("value");
+
+    return snap.val() || {};
+
+}
+
+// ==========================================
+// SALVAR VENCEDOR
+// ==========================================
+
+async function salvarVencedor(tipo,dados){
+
+    return vencedoresRef
+    .child(tipo)
+    .set(dados);
+
+}
+
+// ==========================================
+// DATA BRASILEIRA
+// ==========================================
+
+function dataBrasil(){
+
+    const agora=new Date();
+
+    return agora.toLocaleString("pt-BR");
 
 }
