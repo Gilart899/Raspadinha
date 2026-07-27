@@ -1,125 +1,172 @@
-// ==========================================
-// CONFIGURAÇÕES DA RASPADINHA
-// ==========================================
+/* ==========================================
+   CONFIG.JS
+   Raspadinha Premiada - GilFest
+   Versão 2.0
+========================================== */
 
 const CONFIG = {
 
-    // Quantidade total de participantes
+    // ======================================
+    // CAMPANHA
+    // ======================================
+
+    campanha: "🍀 Raspadinha Premiada",
+
+    empresa: "GilFest",
+
+    ativa: true,
+
+    // ======================================
+    // PARTICIPANTES
+    // ======================================
+
     totalParticipantes: 1000,
 
-    // Quantidade máxima de vencedores
     maxVencedores: 2,
 
-    // Prêmios
-    premios: [
+    // ======================================
+    // PRÊMIOS
+    // ======================================
 
-        {
+    premios: {
+
+        ferro: {
+
             id: 1,
+
             nome: "FERRO ELÉTRICO",
+
             imagem: "img/ferro.png",
+
             quantidade: 1
+
         },
 
-        {
+        liquidificador: {
+
             id: 2,
+
             nome: "LIQUIDIFICADOR",
+
             imagem: "img/liquidificador.png",
+
             quantidade: 1
+
         }
 
-    ],
+    },
 
-    // Mensagem para quem não ganhar
+    // ======================================
+    // MENSAGENS
+    // ======================================
+
+    ganhou: {
+
+        titulo: "🎉 PARABÉNS!",
+
+        texto: "Você foi contemplado!"
+
+    },
+
     perdeu: {
-        nome: "NÃO FOI DESSA VEZ",
+
+        titulo: "🍀 NÃO FOI DESSA VEZ",
+
+        texto: "Obrigado por participar!",
+
         imagem: ""
+
+    },
+
+    encerrada: {
+
+        titulo: "❌ PROMOÇÃO ENCERRADA",
+
+        texto: "Todas as participações já foram realizadas."
+
+    },
+
+    // ======================================
+    // WHATSAPP
+    // ======================================
+
+    whatsapp: "5579999145044",
+
+    mensagemWhatsapp:
+
+        "🍀 Acabei de participar da Raspadinha Premiada! Venha participar também!",
+
+    // ======================================
+    // CORES
+    // ======================================
+
+    cores: {
+
+        principal: "#00B050",
+
+        secundaria: "#FFD700",
+
+        fundo: "#0B8E36",
+
+        texto: "#FFFFFF"
+
+    },
+
+    // ======================================
+    // EFEITOS
+    // ======================================
+
+    efeitos: {
+
+        trevos: true,
+
+        confetes: true,
+
+        particulas: true,
+
+        vibracao: true,
+
+        sons: true
+
+    },
+
+    // ======================================
+    // RASPADINHA
+    // ======================================
+
+    raspadinha: {
+
+        largura: 320,
+
+        altura: 320,
+
+        raio: 24,
+
+        porcentagemRevelar: 70
+
+    },
+
+    // ======================================
+    // FIREBASE
+    // ======================================
+
+    firebase: {
+
+        participantes: "participantes",
+
+        premios: "premios",
+
+        campanha: "campanha",
+
+        contador: "contador",
+
+        vencedores: "vencedores"
+
     }
 
 };
 
+// Impede alterações acidentais
+Object.freeze(CONFIG);
 
-// ==========================================
-// CONTROLE LOCAL
-// (Depois será substituído pelo Firebase)
-// ==========================================
-
-let ESTADO = {
-
-    participantes: 0,
-
-    vencedores: {
-
-        ferro: 0,
-
-        liquidificador: 0
-
-    }
-
-};
-
-
-// ==========================================
-// SORTEAR RESULTADO
-// ==========================================
-
-function sortearPremio(){
-
-    ESTADO.participantes++;
-
-    // Depois dos 1000 participantes,
-    // ninguém mais participa.
-
-    if(ESTADO.participantes > CONFIG.totalParticipantes){
-
-        return CONFIG.perdeu;
-
-    }
-
-    // Escolhe dois números aleatórios
-    // diferentes entre 1 e 1000
-
-    if(!window.numeroFerro){
-
-        window.numeroFerro =
-        Math.floor(Math.random()*1000)+1;
-
-        do{
-
-            window.numeroLiquidificador =
-            Math.floor(Math.random()*1000)+1;
-
-        }while(window.numeroLiquidificador===window.numeroFerro);
-
-    }
-
-    // Ganhou o ferro
-
-    if(
-        ESTADO.participantes===window.numeroFerro &&
-        ESTADO.vencedores.ferro===0
-    ){
-
-        ESTADO.vencedores.ferro++;
-
-        return CONFIG.premios[0];
-
-    }
-
-    // Ganhou o liquidificador
-
-    if(
-        ESTADO.participantes===window.numeroLiquidificador &&
-        ESTADO.vencedores.liquidificador===0
-    ){
-
-        ESTADO.vencedores.liquidificador++;
-
-        return CONFIG.premios[1];
-
-    }
-
-    // Não ganhou
-
-    return CONFIG.perdeu;
-
-}
+console.log("CONFIG.JS carregado com sucesso.");
