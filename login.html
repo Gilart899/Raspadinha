@@ -48,6 +48,7 @@ margin-bottom:15px;
 font-size:16px;
 border-radius:10px;
 border:1px solid #CCC;
+box-sizing:border-box;
 
 }
 
@@ -88,9 +89,14 @@ margin-top:15px;
 <h1>🔒 Administração</h1>
 
 <input
+id="email"
+type="email"
+placeholder="E-mail">
+
+<input
 id="senha"
 type="password"
-placeholder="Digite a senha">
+placeholder="Senha">
 
 <button onclick="entrar()">
 
@@ -102,11 +108,15 @@ Entrar
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+
+<script src="firebase.js"></script>
+
 <script src="login.js"></script>
-
-}
-
-</script>
 
 </body>
 
