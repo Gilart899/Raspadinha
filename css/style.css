@@ -1,0 +1,793 @@
+/* ==========================================
+   RASPADINHA PREMIADA v2.0
+   GilFest
+========================================== */
+
+:root{
+
+--verde:#0B8E36;
+--verde2:#17B34A;
+--dourado:#FFD700;
+--branco:#FFFFFF;
+--cinza:#F2F2F2;
+--preto:#101010;
+--sombra:0 10px 30px rgba(0,0,0,.25);
+
+}
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+html{
+
+scroll-behavior:smooth;
+
+}
+
+body{
+
+font-family:Arial,Helvetica,sans-serif;
+
+background:linear-gradient(180deg,#0B8E36,#0A5A24);
+
+min-height:100vh;
+
+overflow-x:hidden;
+
+color:white;
+
+}
+
+/* ===========================
+FUNDO
+=========================== */
+
+#background{
+
+position:fixed;
+
+inset:0;
+
+overflow:hidden;
+
+z-index:-1;
+
+background:
+
+radial-gradient(circle at top,
+rgba(255,255,255,.08),
+transparent 40%),
+
+linear-gradient(
+180deg,
+#0B8E36,
+#08561F);
+
+}
+
+/* ===========================
+LOGO
+=========================== */
+
+.logo{
+
+width:140px;
+
+display:block;
+
+margin:35px auto 15px;
+
+animation:flutuar 3s ease-in-out infinite;
+
+}
+
+/* ===========================
+HEADER
+=========================== */
+
+header{
+
+text-align:center;
+
+padding:20px;
+
+}
+
+header h1{
+
+font-size:2.2rem;
+
+margin-bottom:12px;
+
+text-shadow:2px 2px 8px rgba(0,0,0,.4);
+
+}
+
+header p{
+
+font-size:1rem;
+
+opacity:.95;
+
+}
+
+/* ===========================
+PRÊMIOS
+=========================== */
+
+.premios{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:20px;
+
+flex-wrap:wrap;
+
+padding:25px;
+
+}
+
+.card{
+
+background:white;
+
+width:250px;
+
+border-radius:22px;
+
+padding:20px;
+
+box-shadow:var(--sombra);
+
+transition:.35s;
+
+}
+
+.card:hover{
+
+transform:translateY(-8px);
+
+}
+
+.card img{
+
+width:150px;
+
+height:150px;
+
+object-fit:contain;
+
+display:block;
+
+margin:auto;
+
+}
+
+.card h2{
+
+text-align:center;
+
+margin-top:15px;
+
+color:#333;
+
+font-size:1.3rem;
+
+}
+
+.ou{
+
+font-size:2rem;
+
+font-weight:bold;
+
+color:var(--dourado);
+
+text-shadow:0 0 15px gold;
+
+}
+
+/* ===========================
+BOTÃO
+=========================== */
+
+.acao{
+
+display:flex;
+
+justify-content:center;
+
+padding:35px;
+
+}
+
+#btnParticipar{
+
+padding:18px 45px;
+
+font-size:1.2rem;
+
+font-weight:bold;
+
+border:none;
+
+border-radius:50px;
+
+cursor:pointer;
+
+background:linear-gradient(
+45deg,
+#FFD700,
+#FFC000);
+
+color:#222;
+
+box-shadow:
+
+0 0 20px rgba(255,215,0,.6);
+
+transition:.3s;
+
+}
+
+#btnParticipar:hover{
+
+transform:scale(1.05);
+
+box-shadow:
+
+0 0 35px rgba(255,215,0,.9);
+
+}
+
+/* ===========================
+RESPONSIVO
+=========================== */
+
+@media(max-width:768px){
+
+header h1{
+
+font-size:1.8rem;
+
+}
+
+.card{
+
+width:90%;
+
+max-width:320px;
+
+}
+
+.logo{
+
+width:110px;
+
+}
+
+}
+
+/* ===========================
+ANIMAÇÕES
+=========================== */
+
+@keyframes flutuar{
+
+0%{
+
+transform:translateY(0);
+
+}
+
+50%{
+
+transform:translateY(-10px);
+
+}
+
+100%{
+
+transform:translateY(0);
+
+}
+
+}
+/* ==========================================
+   TREVOS ANIMADOS
+========================================== */
+
+#trevos{
+
+position:absolute;
+
+inset:0;
+
+overflow:hidden;
+
+pointer-events:none;
+
+}
+
+.trevo{
+
+position:absolute;
+
+width:28px;
+
+height:28px;
+
+background:url("../img/trevo.png");
+
+background-size:contain;
+
+background-repeat:no-repeat;
+
+opacity:.85;
+
+animation:cair linear forwards;
+
+}
+
+@keyframes cair{
+
+0%{
+
+transform:
+translateY(-50px)
+rotate(0deg);
+
+opacity:0;
+
+}
+
+15%{
+
+opacity:1;
+
+}
+
+100%{
+
+transform:
+translateY(120vh)
+rotate(720deg);
+
+opacity:0;
+
+}
+
+}
+
+/* ==========================================
+   PARTÍCULAS
+========================================== */
+
+#particulas{
+
+position:absolute;
+
+inset:0;
+
+pointer-events:none;
+
+overflow:hidden;
+
+}
+
+.particula{
+
+position:absolute;
+
+width:6px;
+
+height:6px;
+
+border-radius:50%;
+
+background:white;
+
+opacity:.5;
+
+animation:brilhar 5s linear forwards;
+
+}
+
+@keyframes brilhar{
+
+0%{
+
+transform:translateY(100vh);
+
+opacity:0;
+
+}
+
+30%{
+
+opacity:.8;
+
+}
+
+100%{
+
+transform:translateY(-120px);
+
+opacity:0;
+
+}
+
+}
+
+/* ==========================================
+   PRODUTOS PASSANDO
+========================================== */
+
+.produto{
+
+position:absolute;
+
+width:180px;
+
+height:180px;
+
+background-size:contain;
+
+background-repeat:no-repeat;
+
+background-position:center;
+
+opacity:.18;
+
+}
+
+.ferro{
+
+background-image:url("../img/ferro.png");
+
+top:12%;
+
+left:-220px;
+
+animation:ferroPasseio 30s linear infinite;
+
+}
+
+.liquidificador{
+
+background-image:url("../img/liquidificador.png");
+
+bottom:8%;
+
+right:-220px;
+
+animation:liquidificadorPasseio 34s linear infinite;
+
+}
+
+@keyframes ferroPasseio{
+
+0%{
+
+left:-220px;
+
+transform:rotate(-8deg);
+
+}
+
+100%{
+
+left:110%;
+
+transform:rotate(8deg);
+
+}
+
+}
+
+@keyframes liquidificadorPasseio{
+
+0%{
+
+right:-220px;
+
+transform:rotate(10deg);
+
+}
+
+100%{
+
+right:110%;
+
+transform:rotate(-10deg);
+
+}
+
+}
+
+/* ==========================================
+   MODAL
+========================================== */
+
+#modal{
+
+position:fixed;
+
+inset:0;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:rgba(0,0,0,.82);
+
+backdrop-filter:blur(8px);
+
+z-index:9999;
+
+}
+
+.hidden{
+
+display:none !important;
+
+}
+
+.janela{
+
+width:95%;
+
+max-width:430px;
+
+background:white;
+
+color:#333;
+
+border-radius:25px;
+
+padding:25px;
+
+text-align:center;
+
+box-shadow:0 15px 40px rgba(0,0,0,.35);
+
+animation:abrir .35s ease;
+
+}
+
+@keyframes abrir{
+
+from{
+
+opacity:0;
+
+transform:scale(.85);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+
+/* ==========================================
+   ÁREA DA RASPADINHA
+========================================== */
+
+#raspadinha{
+
+position:relative;
+
+width:320px;
+
+height:320px;
+
+margin:25px auto;
+
+border-radius:18px;
+
+overflow:hidden;
+
+border:6px solid gold;
+
+background:white;
+
+box-shadow:0 0 25px rgba(255,215,0,.5);
+
+}
+
+#premio{
+
+position:absolute;
+
+inset:0;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+#premio img{
+
+width:170px;
+
+max-width:80%;
+
+margin-bottom:12px;
+
+}
+
+#textoPremio{
+
+font-size:26px;
+
+font-weight:bold;
+
+color:#0B8E36;
+
+}
+
+canvas{
+
+position:absolute;
+
+inset:0;
+
+width:100%;
+
+height:100%;
+
+cursor:pointer;
+
+}
+
+/* ==========================================
+   BOTÕES DO MODAL
+========================================== */
+
+.botoes{
+
+display:flex;
+
+justify-content:center;
+
+gap:12px;
+
+margin-top:20px;
+
+flex-wrap:wrap;
+
+}
+
+.botoes button{
+
+padding:12px 25px;
+
+border:none;
+
+border-radius:30px;
+
+font-size:16px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+transition:.3s;
+
+}
+
+#compartilhar{
+
+background:#25D366;
+
+color:white;
+
+}
+
+#fechar{
+
+background:#555;
+
+color:white;
+
+}
+
+.botoes button:hover{
+
+transform:translateY(-2px);
+
+}
+
+/* ==========================================
+   CONFETES
+========================================== */
+
+#confetes{
+
+position:fixed;
+
+inset:0;
+
+pointer-events:none;
+
+overflow:hidden;
+
+z-index:99999;
+
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+#loading{
+
+position:fixed;
+
+inset:0;
+
+background:#0B8E36;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+z-index:999999;
+
+color:white;
+
+}
+
+.spinner{
+
+width:70px;
+
+height:70px;
+
+border:8px solid rgba(255,255,255,.25);
+
+border-top:8px solid white;
+
+border-radius:50%;
+
+animation:girar 1s linear infinite;
+
+margin-bottom:20px;
+
+}
+
+@keyframes girar{
+
+100%{
+
+transform:rotate(360deg);
+
+}
+
+}
