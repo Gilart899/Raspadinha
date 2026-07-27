@@ -3,6 +3,15 @@
 // GilFest - Painel Administrativo
 // ==========================================
 
+// ==========================================
+// PROTEÇÃO DO PAINEL
+// ==========================================
+
+if (localStorage.getItem("admin") !== "ok") {
+
+    location.replace("login.html");
+
+}
 // Firebase
 const db = firebase.database();
 
