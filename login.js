@@ -5,46 +5,88 @@
 
 "use strict";
 
-// Senha do administrador
-const SENHA = "GilFest2026";
-
 // Se já estiver logado, entra direto
-if (localStorage.getItem("admin") === "ok") {
+firebase.auth().onAuthStateChanged((user) => {
 
-    location.replace("admin.html");
+    if (user) {
 
-}
+        location.replace("admin.html");
 
-const campoSenha = document.getElementById("senha");
-const erro = document.getElementById("erro");
+    }
+
+});
 
 // Entrar
 function entrar() {
 
-    const senha = campoSenha.value.trim();
+    const email = document
+        .getElementById("email")
+        .value
+        .trim();
 
-    if (senha === SENHA) {
+    const senha = document
+        .getElementById("senha")
+        .value;
 
-        localStorage.setItem("admin", "ok");
+    const erro = document
+        .getElementById("erro");
 
-        location.replace("admin.html");
+    erro.textContent = "";
 
-    } else {
+    if (email === "" || senha === "") {
 
-        erro.textContent = "Senha incorreta.";
+        erro.textContent = "Preencha o e-mail e a senha.";
 
-        campoSenha.value = "";
-
-        campoSenha.focus();
+        return;
 
     }
 
+    firebase.auth()
+
+        .signInWithEmailAndPassword(email, senha)
+
+        .then(() => {
+
+            location.replace("admin.html");
+
+        })
+
+        .catch((error) => {
+
+            switch (error.code) {
+
+                case "auth/invalid-email":
+                    erro.textContent = "E-mail inválido.";
+                    break;
+
+                case "auth/user-not-found":
+                    erro.textContent = "Usuário não encontrado.";
+                    break;
+
+                case "auth/wrong-password":
+                case "auth/invalid-credential":
+                    erro.textContent = "E-mail ou senha incorretos.";
+                    break;
+
+                case "auth/too-many-requests":
+                    erro.textContent = "Muitas tentativas. Tente novamente mais tarde.";
+                    break;
+
+                default:
+                    erro.textContent = error.message;
+
+            }
+
+        });
+
 }
 
-// Enter
-campoSenha.addEventListener("keydown", function (e) {
+// Entrar pressionando ENTER
+document.getElementById("senha")
 
-    if (e.key === "Enter") {
+.addEventListener("keydown", function(e){
+
+    if(e.key==="Enter"){
 
         entrar();
 
@@ -52,9 +94,21 @@ campoSenha.addEventListener("keydown", function (e) {
 
 });
 
-// Limpar erro
-campoSenha.addEventListener("input", function () {
+// Limpar erro ao digitar
+document.getElementById("email")
 
-    erro.textContent = "";
+.addEventListener("input",()=>{
+
+    document.getElementById("erro").textContent="";
 
 });
+
+document.getElementById("senha")
+
+.addEventListener("input",()=>{
+
+    document.getElementById("erro").textContent="";
+
+});
+
+console.log("Login.js carregado.");
