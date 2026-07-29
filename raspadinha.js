@@ -605,11 +605,7 @@ function perdedor(){
 
 }
 // ==========================================
-// SORTEIO VIA FIREBASE
-// ==========================================
-
-// ==========================================
-// BUSCAR CONFIGURAÇÃO DA CAMPANHA
+// CARREGAR CAMPANHA
 // ==========================================
 
 async function carregarCampanha() {
@@ -627,19 +623,74 @@ async function carregarCampanha() {
 }
 
 // ==========================================
-// SORTEIO VIA FIREBASE
+// RESERVAR PRÊMIO
+// ==========================================
+
+async function reservarPremio(tipoPremio) {
+
+    const transacao = await premiosRef.child(tipoPremio).transaction((premio) => {
+
+        if (premio === null) return;
+
+        // Já foi entregue
+        if (!premio.disponivel) {
+
+            return;
+
+        }
+
+        premio.disponivel = false;
+
+        premio.numeroRifa = numeroRifa;
+
+        premio.data = new Date().toLocaleString("pt-BR");
+
+        premio.timestamp = Date.now();
+
+        return premio;
+
+    });
+
+    return transacao.committed;
+
+}
+
+// ==========================================
+// SORTEIO FIREBASE
 // ==========================================
 
 async function sortearPremioFirebase() {
 
     try {
 
-        // Incrementa o contador usando transação
+        // Carrega campanha
+        const campanha = await carregarCampanha();
+
+        // Campanha ativa?
+        if (!campanha.ativa) {
+
+            return {
+
+                ganhou: false,
+
+                nome: "Campanha encerrada.",
+
+                imagem: ""
+
+            };
+
+        }
+
+        // Incrementa contador
         const contador = await contadorRef.transaction((dados) => {
 
             if (dados === null) {
 
-                return { total: 1 };
+                return {
+
+                    total: 1
+
+                };
 
             }
 
@@ -651,8 +702,7 @@ async function sortearPremioFirebase() {
 
         const total = contador.snapshot.val().total;
 
-        // Carrega campanha
-        const campanha = await carregarCampanha();
+        // Limite de participantes
 
         if (total > campanha.totalParticipantes) {
 
@@ -668,19 +718,21 @@ async function sortearPremioFirebase() {
 
         }
 
-        // Prêmios
+        // Busca prêmios
+
         const premiosSnap = await premiosRef.once("value");
 
+        if (!premiosSnap.exists()) {
+
+            throw new Error("Prêmios não encontrados.");
+
+        }
+
         const premios = premiosSnap.val();
-       if (!premios) {
 
-    throw new Error("Prêmios não configurados.");
-
-}
-
-        // ============================
+        // =====================================
         // FERRO
-        // ============================
+        // =====================================
 
         if (
 
@@ -690,33 +742,45 @@ async function sortearPremioFirebase() {
 
         ) {
 
-            await premiosRef.child("ferro").update({
+            const reservado =
 
-                disponivel: false,
+            await reservarPremio("ferro");
 
-                numeroRifa: numeroRifa,
+            if (!reservado) {
 
-                data: new Date().toLocaleString("pt-BR")
+                return {
 
-            });
+                    ganhou: false,
+
+                    nome: CONFIG.perdeu.nome,
+
+                    imagem: CONFIG.perdeu.imagem
+
+                };
+
+            }
 
             return {
 
                 ganhou: true,
 
+                premio: "ferro",
+
                 nome: premios.ferro.nome,
 
                 imagem: premios.ferro.imagem,
 
-                premio: "ferro"
+                numeroRifa: numeroRifa,
+
+                participante: total
 
             };
 
         }
 
-        // ============================
+        // =====================================
         // LIQUIDIFICADOR
-        // ============================
+        // =====================================
 
         if (
 
@@ -726,25 +790,37 @@ async function sortearPremioFirebase() {
 
         ) {
 
-            await premiosRef.child("liquidificador").update({
+            const reservado =
 
-                disponivel: false,
+            await reservarPremio("liquidificador");
 
-                numeroRifa: numeroRifa,
+            if (!reservado) {
 
-                data: new Date().toLocaleString("pt-BR")
+                return {
 
-            });
+                    ganhou: false,
+
+                    nome: CONFIG.perdeu.nome,
+
+                    imagem: CONFIG.perdeu.imagem
+
+                };
+
+            }
 
             return {
 
                 ganhou: true,
+
+                premio: "liquidificador",
 
                 nome: premios.liquidificador.nome,
 
                 imagem: premios.liquidificador.imagem,
 
-                premio: "liquidificador"
+                numeroRifa: numeroRifa,
+
+                participante: total
 
             };
 
@@ -758,150 +834,9 @@ async function sortearPremioFirebase() {
 
             nome: CONFIG.perdeu.nome,
 
-            imagem: CONFIG.perdeu.imagem
+            imagem: CONFIG.perdeu.imagem,
 
-        };
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        return {
-
-            ganhou: false,
-
-            nome: "Erro",
-
-            imagem: ""
-
-        };
-
-    }
-
-                   }
-
-            dados.total++;
-
-            return dados;
-
-        });
-
-        const total = contador.snapshot.val().total;
-
-        // Limite da campanha
-        if (total > CONFIG.totalParticipantes) {
-
-            return {
-
-                ganhou: false,
-
-                nome: CONFIG.perdeu.nome,
-
-                imagem: CONFIG.perdeu.imagem
-
-            };
-
-        }
-
-        // Carrega os prêmios
-        const premiosSnap = await premiosRef.once("value");
-
-        const premios = premiosSnap.val();
-
-        if (!premios) {
-
-            throw new Error("Prêmios não encontrados.");
-
-        }
-
-        // Números premiados
-        const numeroFerro =
-            CONFIG.premios.ferro.numero;
-
-        const numeroLiquidificador =
-            CONFIG.premios.liquidificador.numero;
-
-        // ==================================
-        // FERRO ELÉTRICO
-        // ==================================
-
-        if (
-
-            total === numeroFerro &&
-
-            premios.ferro.disponivel
-
-        ) {
-
-            await premiosRef.child("ferro").update({
-
-                disponivel: false,
-
-                numero: numeroRifa,
-
-                data: new Date().toLocaleString("pt-BR")
-
-            });
-
-            return {
-
-                ganhou: true,
-
-                nome: CONFIG.premios.ferro.nome,
-
-                imagem: CONFIG.premios.ferro.imagem,
-
-                premio: "ferro"
-
-            };
-
-        }
-
-        // ==================================
-        // LIQUIDIFICADOR
-        // ==================================
-
-        if (
-
-            total === numeroLiquidificador &&
-
-            premios.liquidificador.disponivel
-
-        ) {
-
-            await premiosRef.child("liquidificador").update({
-
-                disponivel: false,
-
-                numero: numeroRifa,
-
-                data: new Date().toLocaleString("pt-BR")
-
-            });
-
-            return {
-
-                ganhou: true,
-
-                nome: CONFIG.premios.liquidificador.nome,
-
-                imagem: CONFIG.premios.liquidificador.imagem,
-
-                premio: "liquidificador"
-
-            };
-
-        }
-
-        // Não ganhou
-
-        return {
-
-            ganhou: false,
-
-            nome: CONFIG.perdeu.nome,
-
-            imagem: CONFIG.perdeu.imagem
+            participante: total
 
         };
 
@@ -915,7 +850,7 @@ async function sortearPremioFirebase() {
 
             ganhou: false,
 
-            nome: "Erro",
+            nome: "Erro interno",
 
             imagem: ""
 
@@ -923,4 +858,4 @@ async function sortearPremioFirebase() {
 
     }
 
-                   }
+}
