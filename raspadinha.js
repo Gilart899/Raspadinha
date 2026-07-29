@@ -426,3 +426,181 @@ if (btnNova) {
     );
 
 }
+
+// ==========================================
+// REVELAR PRÊMIO
+// ==========================================
+
+async function revelarPremio() {
+
+    if (premioAtual !== null) return;
+
+    try {
+
+        // Bloqueia imediatamente este número
+        await bloquearNumero();
+
+        // Consulta o resultado
+        const resultado = await sortearPremioFirebase();
+
+        premioAtual = resultado;
+
+        // Limpa a cobertura
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        ctx.globalCompositeOperation = "source-over";
+
+        // Fundo branco
+        ctx.fillStyle = "#FFFFFF";
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        // Desenha imagem
+        if(resultado.imagem){
+
+            await desenharImagem(resultado.imagem);
+
+        }
+
+        // Nome do prêmio
+        desenharTexto(resultado.nome);
+
+        // Resultado
+
+        if(resultado.ganhou){
+
+            vencedor(resultado);
+
+        }else{
+
+            perdedor();
+
+        }
+
+    }catch(erro){
+
+        console.error(erro);
+
+        alert(
+            "Erro ao consultar o servidor."
+        );
+
+    }
+
+}
+// ==========================================
+// DESENHAR IMAGEM
+// ==========================================
+
+function desenharImagem(src){
+
+    return new Promise((resolve)=>{
+
+        const img=new Image();
+
+        img.onload=function(){
+
+            ctx.drawImage(
+
+                img,
+
+                35,
+
+                15,
+
+                250,
+
+                170
+
+            );
+
+            resolve();
+
+        };
+
+        img.onerror=resolve;
+
+        img.src=src;
+
+    });
+
+}
+// ==========================================
+// DESENHAR TEXTO
+// ==========================================
+
+function desenharTexto(texto){
+
+    ctx.fillStyle="#222";
+
+    ctx.font="bold 22px Arial";
+
+    ctx.textAlign="center";
+
+    ctx.fillText(
+
+        texto,
+
+        canvas.width/2,
+
+        225
+
+    );
+
+}
+// ==========================================
+// GANHOU
+// ==========================================
+
+function vencedor(resultado){
+
+    if(typeof mostrarConfetes==="function"){
+
+        mostrarConfetes();
+
+    }
+
+    if(typeof vibrar==="function"){
+
+        vibrar();
+
+    }
+
+    if(typeof tocarSomVitoria==="function"){
+
+        tocarSomVitoria();
+
+    }
+
+    abrirFormularioGanhador(resultado);
+
+           }
+// ==========================================
+// PERDEU
+// ==========================================
+
+function perdedor(){
+
+    if(typeof tocarSomPerdeu==="function"){
+
+        tocarSomPerdeu();
+
+    }
+
+    alert(
+
+        "Que pena! Não foi desta vez."
+
+    );
+
+}
