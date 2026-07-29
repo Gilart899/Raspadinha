@@ -1,61 +1,119 @@
-// ===============================
-// SORTEIO OFICIAL
-// ===============================
+// ===========================================
+// SORTEIO
+// ===========================================
 
-// Estes números devem ser gerados UMA ÚNICA VEZ
-// e gravados no Firebase.
+import {
 
-const NUMERO_FERRO = 237;
-const NUMERO_LIQUIDIFICADOR = 814;
+    carregarPremios,
+    salvarVencedor,
+    registrarTentativa,
+    incrementarParticipantes,
+    incrementarVencedores
 
-// ===============================
+} from "./firebase-raspadinha.js";
 
-async function verificarPremio(numeroParticipante, idParticipante) {
+// ===========================================
 
-    const premios = await lerPremios();
+let premios = [];
 
-    // Ferro
+// ===========================================
 
-    if (
-        numeroParticipante === NUMERO_FERRO &&
-        premios.ferro.disponivel
-    ) {
+export async function realizarSorteio(participante){
 
-        await entregarPremio("ferro", idParticipante);
+    await carregar();
+
+    await incrementarParticipantes();
+
+    const premio = escolherPremio();
+
+    if(!premio){
+
+        await registrarTentativa({
+
+            participante,
+
+            ganhou:false,
+
+            data:new Date().toISOString()
+
+        });
 
         return {
-            ganhou: true,
-            nome: "FERRO ELÉTRICO",
-            imagem: "img/ferro.png"
+
+            ganhou:false,
+
+            titulo:"Não foi dessa vez",
+
+            imagem:"img/perdeu.png"
+
         };
 
     }
 
-    // Liquidificador
+    premio.quantidade--;
 
-    if (
-        numeroParticipante === NUMERO_LIQUIDIFICADOR &&
-        premios.liquidificador.disponivel
-    ) {
+    await salvarVencedor({
 
-        await entregarPremio("liquidificador", idParticipante);
+        participante,
 
-        return {
-            ganhou: true,
-            nome: "LIQUIDIFICADOR",
-            imagem: "img/liquidificador.png"
-        };
+        premio:premio.nome,
 
-    }
+        data:new Date().toISOString()
+
+    });
+
+    await incrementarVencedores();
+
+    await registrarTentativa({
+
+        participante,
+
+        ganhou:true,
+
+        premio:premio.nome,
+
+        data:new Date().toISOString()
+
+    });
 
     return {
 
-        ganhou: false,
+        ganhou:true,
 
-        nome: "NÃO FOI DESSA VEZ",
+        titulo:premio.nome,
 
-        imagem: ""
+        imagem:premio.imagem
 
     };
+
+}
+
+// ===========================================
+
+async function carregar(){
+
+    premios = await carregarPremios();
+
+}
+
+// ===========================================
+
+function escolherPremio(){
+
+    const disponiveis = premios.filter(p=>p.quantidade>0);
+
+    if(disponiveis.length===0){
+
+        return null;
+
+    }
+
+    const indice = Math.floor(
+
+        Math.random()*disponiveis.length
+
+    );
+
+    return disponiveis[indice];
 
 }
