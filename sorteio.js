@@ -1,88 +1,95 @@
 // ===========================================
-// SORTEIO
+// SORTEIO TRANSACIONAL
 // ===========================================
 
 import {
+    getDB
+} from "./firebase.js";
 
-    carregarPremios,
-    salvarVencedor,
-    registrarTentativa,
-    incrementarParticipantes,
-    incrementarVencedores
-
-} from "./firebase-raspadinha.js";
-
-// ===========================================
-
-let premios = [];
+import {
+    ref,
+    runTransaction,
+    push,
+    set,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
 // ===========================================
 
-export async function realizarSorteio(participante){
+const db = () => getDB();
 
-    await carregar();
+// ===========================================
 
-    await incrementarParticipantes();
+export async function realizarSorteio(participante) {
 
-    const premio = escolherPremio();
+    const premiosRef = ref(db(), "premios");
 
-    if(!premio){
+    const resultado = await runTransaction(premiosRef, (premios) => {
 
-        await registrarTentativa({
+        if (!premios) return premios;
 
-            participante,
+        const disponiveis = Object.entries(premios)
+            .filter(([id, premio]) => premio.quantidade > 0);
 
-            ganhou:false,
+        if (!disponiveis.length) {
 
-            data:new Date().toISOString()
+            return premios;
 
-        });
+        }
+
+        const indice = Math.floor(Math.random() * disponiveis.length);
+
+        const [idPremio] = disponiveis[indice];
+
+        premios[idPremio].quantidade--;
+
+        premios[idPremio].ultimoGanhador = participante.cpf;
+
+        premios[idPremio].ultimaData = Date.now();
+
+        premios.__resultado = idPremio;
+
+        return premios;
+
+    });
+
+    if (!resultado.committed) {
 
         return {
-
-            ganhou:false,
-
-            titulo:"Não foi dessa vez",
-
-            imagem:"img/perdeu.png"
-
+            ganhou: false
         };
 
     }
 
-    premio.quantidade--;
+    const dados = resultado.snapshot.val();
 
-    await salvarVencedor({
+    const premioId = dados.__resultado;
 
-        participante,
+    delete dados.__resultado;
 
-        premio:premio.nome,
+    if (!premioId) {
 
-        data:new Date().toISOString()
+        await registrarTentativa(participante);
 
-    });
+        return {
+            ganhou: false
+        };
 
-    await incrementarVencedores();
+    }
 
-    await registrarTentativa({
+    const premio = dados[premioId];
 
-        participante,
-
-        ganhou:true,
-
-        premio:premio.nome,
-
-        data:new Date().toISOString()
-
-    });
+    await salvarVencedor(participante, premio);
 
     return {
 
-        ganhou:true,
+        ganhou: true,
 
-        titulo:premio.nome,
+        id: premioId,
 
-        imagem:premio.imagem
+        nome: premio.nome,
+
+        imagem: premio.imagem
 
     };
 
@@ -90,30 +97,44 @@ export async function realizarSorteio(participante){
 
 // ===========================================
 
-async function carregar(){
+async function salvarVencedor(participante, premio) {
 
-    premios = await carregarPremios();
+    const novo = push(ref(db(), "vencedores"));
+
+    await set(novo, {
+
+        nome: participante.nome,
+
+        cpf: participante.cpf,
+
+        telefone: participante.telefone,
+
+        premio: premio.nome,
+
+        data: serverTimestamp()
+
+    });
 
 }
 
 // ===========================================
 
-function escolherPremio(){
+async function registrarTentativa(participante) {
 
-    const disponiveis = premios.filter(p=>p.quantidade>0);
+    const novo = push(ref(db(), "tentativas"));
 
-    if(disponiveis.length===0){
+    await set(novo, {
 
-        return null;
+        nome: participante.nome,
 
-    }
+        cpf: participante.cpf,
 
-    const indice = Math.floor(
+        telefone: participante.telefone,
 
-        Math.random()*disponiveis.length
+        ganhou: false,
 
-    );
+        data: serverTimestamp()
 
-    return disponiveis[indice];
+    });
 
 }
