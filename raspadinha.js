@@ -858,4 +858,175 @@ async function sortearPremioFirebase() {
 
     }
 
+   // ==========================================
+// FORMULÁRIO DO GANHADOR
+// ==========================================
+
+function abrirFormularioGanhador(resultado){
+
+    let modal=document.getElementById("modalPremio");
+
+    if(!modal){
+
+        modal=document.createElement("div");
+
+        modal.id="modalPremio";
+
+        modal.style.position="fixed";
+        modal.style.left="0";
+        modal.style.top="0";
+        modal.style.width="100%";
+        modal.style.height="100%";
+        modal.style.background="rgba(0,0,0,.85)";
+        modal.style.display="flex";
+        modal.style.justifyContent="center";
+        modal.style.alignItems="center";
+        modal.style.zIndex="99999";
+
+        modal.innerHTML=`
+
+        <div style="
+        background:#FFF;
+        width:95%;
+        max-width:420px;
+        border-radius:20px;
+        padding:25px;
+        text-align:center;
+        ">
+
+            <h2 style="color:#009944">
+            🎉 PARABÉNS!
+            </h2>
+
+            <p>
+
+            Você ganhou:
+
+            <br><br>
+
+            <strong id="premioNome"></strong>
+
+            </p>
+
+            <input
+            id="ganhadorNome"
+            placeholder="Seu nome"
+            style="
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            ">
+
+            <input
+            id="ganhadorWhatsapp"
+            placeholder="WhatsApp"
+            style="
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            ">
+
+            <button
+            id="btnSalvarPremio"
+            style="
+            width:100%;
+            margin-top:20px;
+            padding:15px;
+            background:#00B050;
+            color:#FFF;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            ">
+
+            Receber prêmio
+
+            </button>
+
+        </div>
+
+        `;
+
+        document.body.appendChild(modal);
+
+    }
+
+    document.getElementById("premioNome").innerHTML=resultado.nome;
+
+    document
+    .getElementById("btnSalvarPremio")
+    .onclick=function(){
+
+        salvarGanhador(resultado);
+
+    };
+
+}
+   // ==========================================
+// SALVAR GANHADOR
+// ==========================================
+
+async function salvarGanhador(resultado){
+
+    const nome=
+
+    document
+    .getElementById("ganhadorNome")
+    .value
+    .trim();
+
+    const whatsapp=
+
+    document
+    .getElementById("ganhadorWhatsapp")
+    .value
+    .trim();
+
+    if(nome===""){
+
+        alert("Informe seu nome.");
+
+        return;
+
+    }
+
+    if(whatsapp===""){
+
+        alert("Informe o WhatsApp.");
+
+        return;
+
+    }
+
+    await participantesRef.push({
+
+        nome,
+
+        whatsapp,
+
+        premio:resultado.premio,
+
+        premioNome:resultado.nome,
+
+        numeroRifa:resultado.numeroRifa,
+
+        participante:resultado.participante,
+
+        data:new Date().toLocaleString("pt-BR"),
+
+        timestamp:Date.now()
+
+    });
+
+    alert(
+
+        "Dados enviados com sucesso!\n\nEntraremos em contato para entregar seu prêmio."
+
+    );
+
+    document
+    .getElementById("modalPremio")
+    .remove();
+
+}
 }
