@@ -1,113 +1,125 @@
-/* ==========================================
-   FIREBASE SERVICE
-   GilFest - Raspadinha v2.0
-========================================== */
+// ===========================================
+// FIREBASE SERVICE
+// Todas as operações do Realtime Database
+// ===========================================
 
-const db = firebase.database();
+import { getDB } from "./firebase.js";
 
-// Referências
-const campanhaRef = db.ref("campanha");
-const participantesRef = db.ref("participantes");
-const vencedoresRef = db.ref("vencedores");
-const contadorRef = db.ref("contador");
+import {
 
-// ==========================================
-// REGISTRAR PARTICIPANTE
-// ==========================================
+    ref,
+    get,
+    set,
+    push,
+    update,
+    remove,
+    query,
+    orderByChild,
+    equalTo,
+    runTransaction
 
-async function registrarParticipante(dados){
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-    return participantesRef.push(dados);
+// ===========================================
+
+const db = () => getDB();
+
+// ===========================================
+// LEITURA
+// ===========================================
+
+export async function ler(caminho) {
+
+    const snapshot = await get(ref(db(), caminho));
+
+    return snapshot.exists()
+        ? snapshot.val()
+        : null;
 
 }
 
-// ==========================================
-// VERIFICAR TELEFONE
-// ==========================================
+// ===========================================
+// SALVAR
+// ===========================================
 
-async function telefoneJaExiste(telefone){
+export async function salvar(caminho, dados) {
 
-    const snap = await participantesRef
-    .orderByChild("telefone")
-    .equalTo(telefone)
-    .once("value");
-
-    return snap.exists();
+    await set(ref(db(), caminho), dados);
 
 }
 
-// ==========================================
-// CONTADOR
-// ==========================================
+// ===========================================
+// ATUALIZAR
+// ===========================================
 
-async function incrementarContador(){
+export async function atualizar(caminho, dados) {
 
-    return contadorRef.transaction(valor=>{
+    await update(ref(db(), caminho), dados);
 
-        return (valor || 0)+1;
+}
+
+// ===========================================
+// REMOVER
+// ===========================================
+
+export async function excluir(caminho) {
+
+    await remove(ref(db(), caminho));
+
+}
+
+// ===========================================
+// ADICIONAR
+// ===========================================
+
+export async function adicionar(caminho, dados) {
+
+    const novo = push(ref(db(), caminho));
+
+    await set(novo, dados);
+
+    return novo.key;
+
+}
+
+// ===========================================
+// TRANSACTION
+// ===========================================
+
+export async function incrementar(caminho) {
+
+    const referencia = ref(db(), caminho);
+
+    const resultado = await runTransaction(referencia, (valor) => {
+
+        return (valor || 0) + 1;
 
     });
 
-}
-
-// ==========================================
-// TOTAL DE PARTICIPANTES
-// ==========================================
-
-async function totalParticipantes(){
-
-    const snap = await contadorRef.once("value");
-
-    return snap.val() || 0;
+    return resultado.snapshot.val();
 
 }
 
-// ==========================================
-// CAMPANHA
-// ==========================================
+// ===========================================
+// BUSCAR POR CAMPO
+// ===========================================
 
-async function campanhaAtiva(){
+export async function buscar(caminho, campo, valor) {
 
-    const snap = await campanhaRef.once("value");
+    const consulta = query(
 
-    if(!snap.exists()) return false;
+        ref(db(), caminho),
 
-    return snap.val().ativa===true;
+        orderByChild(campo),
 
-}
+        equalTo(valor)
 
-// ==========================================
-// OBTER VENCEDORES
-// ==========================================
+    );
 
-async function obterVencedores(){
+    const snapshot = await get(consulta);
 
-    const snap = await vencedoresRef.once("value");
-
-    return snap.val() || {};
-
-}
-
-// ==========================================
-// SALVAR VENCEDOR
-// ==========================================
-
-async function salvarVencedor(tipo,dados){
-
-    return vencedoresRef
-    .child(tipo)
-    .set(dados);
-
-}
-
-// ==========================================
-// DATA BRASILEIRA
-// ==========================================
-
-function dataBrasil(){
-
-    const agora=new Date();
-
-    return agora.toLocaleString("pt-BR");
+    return snapshot.exists()
+        ? snapshot.val()
+        : null;
 
 }
