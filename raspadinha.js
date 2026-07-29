@@ -672,6 +672,11 @@ async function sortearPremioFirebase() {
         const premiosSnap = await premiosRef.once("value");
 
         const premios = premiosSnap.val();
+       if (!premios) {
+
+    throw new Error("Prêmios não configurados.");
+
+}
 
         // ============================
         // FERRO
