@@ -604,3 +604,166 @@ function perdedor(){
     );
 
 }
+// ==========================================
+// SORTEIO VIA FIREBASE
+// ==========================================
+
+async function sortearPremioFirebase() {
+
+    try {
+
+        // Incrementa o contador com segurança
+        const contador = await contadorRef.transaction((dados) => {
+
+            if (dados === null) {
+
+                return {
+                    total: 1
+                };
+
+            }
+
+            dados.total++;
+
+            return dados;
+
+        });
+
+        const total = contador.snapshot.val().total;
+
+        // Limite da campanha
+        if (total > CONFIG.totalParticipantes) {
+
+            return {
+
+                ganhou: false,
+
+                nome: CONFIG.perdeu.nome,
+
+                imagem: CONFIG.perdeu.imagem
+
+            };
+
+        }
+
+        // Carrega os prêmios
+        const premiosSnap = await premiosRef.once("value");
+
+        const premios = premiosSnap.val();
+
+        if (!premios) {
+
+            throw new Error("Prêmios não encontrados.");
+
+        }
+
+        // Números premiados
+        const numeroFerro =
+            CONFIG.premios.ferro.numero;
+
+        const numeroLiquidificador =
+            CONFIG.premios.liquidificador.numero;
+
+        // ==================================
+        // FERRO ELÉTRICO
+        // ==================================
+
+        if (
+
+            total === numeroFerro &&
+
+            premios.ferro.disponivel
+
+        ) {
+
+            await premiosRef.child("ferro").update({
+
+                disponivel: false,
+
+                numero: numeroRifa,
+
+                data: new Date().toLocaleString("pt-BR")
+
+            });
+
+            return {
+
+                ganhou: true,
+
+                nome: CONFIG.premios.ferro.nome,
+
+                imagem: CONFIG.premios.ferro.imagem,
+
+                premio: "ferro"
+
+            };
+
+        }
+
+        // ==================================
+        // LIQUIDIFICADOR
+        // ==================================
+
+        if (
+
+            total === numeroLiquidificador &&
+
+            premios.liquidificador.disponivel
+
+        ) {
+
+            await premiosRef.child("liquidificador").update({
+
+                disponivel: false,
+
+                numero: numeroRifa,
+
+                data: new Date().toLocaleString("pt-BR")
+
+            });
+
+            return {
+
+                ganhou: true,
+
+                nome: CONFIG.premios.liquidificador.nome,
+
+                imagem: CONFIG.premios.liquidificador.imagem,
+
+                premio: "liquidificador"
+
+            };
+
+        }
+
+        // Não ganhou
+
+        return {
+
+            ganhou: false,
+
+            nome: CONFIG.perdeu.nome,
+
+            imagem: CONFIG.perdeu.imagem
+
+        };
+
+    }
+
+    catch (erro) {
+
+        console.error(erro);
+
+        return {
+
+            ganhou: false,
+
+            nome: "Erro",
+
+            imagem: ""
+
+        };
+
+    }
+
+                   }
