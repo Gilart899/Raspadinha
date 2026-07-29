@@ -1,51 +1,64 @@
-// ==========================================
-// FIREBASE.JS
-// Raspadinha Premiada
-// GilFest
-// ==========================================
+// ============================
+// FIREBASE
+// Inicialização única
+// ============================
 
-// Configuração Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+// ============================
+// CONFIGURAÇÃO
+// ============================
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyD5i67dD0UvvYTBC-Fp7Anl6naZvBtFD6E",
+    apiKey: CONFIG.firebase.apiKey,
 
-    authDomain: "raspadinha-b8271.firebaseapp.com",
+    authDomain: CONFIG.firebase.authDomain,
 
-    databaseURL: "https://raspadinha-b8271-default-rtdb.firebaseio.com",
+    databaseURL: CONFIG.firebase.databaseURL,
 
-    projectId: "raspadinha-b8271",
+    projectId: CONFIG.firebase.projectId,
 
-    storageBucket: "raspadinha-b8271.firebasestorage.app",
+    storageBucket: CONFIG.firebase.storageBucket,
 
-    messagingSenderId: "304013313818",
+    messagingSenderId: CONFIG.firebase.messagingSenderId,
 
-    appId: "1:304013313818:web:81845a74d20ccc62770ea3"
+    appId: CONFIG.firebase.appId
 
 };
 
-// Inicializa apenas uma vez
+// ============================
 
-if (!firebase.apps.length) {
+let app = null;
 
-    firebase.initializeApp(firebaseConfig);
+let database = null;
+
+// ============================
+
+export async function iniciarFirebase() {
+
+    if (app) {
+
+        return database;
+
+    }
+
+    app = initializeApp(firebaseConfig);
+
+    database = getDatabase(app);
+
+    console.log("✅ Firebase conectado.");
+
+    return database;
 
 }
 
-// Banco de dados
+// ============================
 
-const db = firebase.database();
+export function getDB() {
 
-// Referências principais
+    return database;
 
-const participantesRef = db.ref("participantes");
-
-const premiosRef = db.ref("premios");
-
-const campanhaRef = db.ref("campanha");
-
-const contadorRef = db.ref("contador");
-
-const vencedoresRef = db.ref("vencedores");
-
-console.log("Firebase conectado com sucesso.");
+}
