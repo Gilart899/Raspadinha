@@ -5,12 +5,11 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>🍀 Raspadinha Premiada</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <meta name="theme-color" content="#0b7d2b">
+
+<title>🍀 Raspadinha Premiada</title>
 
 <link rel="manifest" href="manifest.json">
 
@@ -24,193 +23,156 @@ content="width=device-width, initial-scale=1.0">
 
 <body>
 
-<!-- FUNDO -->
+<!-- =========================
+     BACKGROUND
+========================= -->
 
 <div id="background">
 
-<div id="trevos"></div>
+    <div id="trevos"></div>
 
-<div id="particulas"></div>
+    <div id="particulas"></div>
 
-<div class="produto ferro"></div>
+    <div class="produto ferro"></div>
 
-<div class="produto liquidificador"></div>
+    <div class="produto liquidificador"></div>
 
 </div>
 
-<!-- TOPO -->
+<!-- =========================
+     HEADER
+========================= -->
 
 <header>
 
-<img
-src="img/logo.png"
-class="logo">
+    <img
+        src="img/logo.png"
+        class="logo"
+        alt="Logo">
 
-<h1>
+    <h1>🍀 RASPADINHA PREMIADA</h1>
 
-🍀 RASPADINHA PREMIADA
-
-</h1>
-
-<p>
-
-Concorra a um dos prêmios!
-
-</p>
+    <p>Concorra a um dos prêmios!</p>
 
 </header>
 
-<!-- PRÊMIOS -->
+<!-- =========================
+     PRÊMIOS
+========================= -->
 
 <section class="premios">
 
-<div class="card">
+    <article class="card">
 
-<img
-src="img/ferro.png">
+        <img
+            src="img/ferro.png"
+            alt="Ferro">
 
-<h2>
+        <h2>Ferro Elétrico</h2>
 
-Ferro Elétrico
+    </article>
 
-</h2>
+    <div class="ou">OU</div>
 
-</div>
+    <article class="card">
 
-<div class="ou">
+        <img
+            src="img/liquidificador.png"
+            alt="Liquidificador">
 
-OU
+        <h2>Liquidificador</h2>
 
-</div>
-
-<div class="card">
-
-<img
-src="img/liquidificador.png">
-
-<h2>
-
-Liquidificador
-
-</h2>
-
-</div>
+    </article>
 
 </section>
 
-<!-- BOTÃO -->
+<!-- =========================
+     BOTÃO
+========================= -->
 
 <section class="acao">
 
-<button id="btnParticipar">
+    <button id="btnParticipar">
 
-🎁 RASPE E CONCORRA
+        🎁 RASPE E CONCORRA
 
-</button>
+    </button>
 
 </section>
 
-<!-- MODAL -->
+<!-- =========================
+     MODAL
+========================= -->
 
 <div
-id="modal"
-class="hidden">
+    id="modal"
+    class="hidden">
 
-<div class="janela">
+    <div class="janela">
 
-<h2>
+        <h2>🍀 Boa sorte!</h2>
 
-🍀 Boa sorte!
+        <p>Raspe toda a área abaixo.</p>
 
-</h2>
+        <div id="raspadinha">
 
-<p>
+            <canvas id="canvas"></canvas>
 
-Raspe toda a área abaixo.
+            <div id="premio">
 
-</p>
+                <img
+                    id="imagemPremio"
+                    alt="Prêmio">
 
-<div id="raspadinha">
+                <h1 id="textoPremio"></h1>
 
-<canvas
-id="canvas">
-</canvas>
+            </div>
 
-<div id="premio">
+        </div>
 
-<img
-id="imagemPremio">
+        <div class="botoes">
 
-<h1
-id="textoPremio">
+            <button id="compartilhar">
 
-</h1>
+                Compartilhar
 
-</div>
+            </button>
 
-</div>
+            <button id="fechar">
 
-<div class="botoes">
+                Fechar
 
-<button
-id="compartilhar">
+            </button>
 
-Compartilhar
+        </div>
 
-</button>
-
-<button
-id="fechar">
-
-Fechar
-
-</button>
+    </div>
 
 </div>
 
-</div>
-
-</div>
-
-<!-- CONFETES -->
+<!-- =========================
+     CONFETES
+========================= -->
 
 <div id="confetes"></div>
 
-<!-- LOADING -->
+<!-- =========================
+     LOADING
+========================= -->
 
 <div id="loading">
 
-<div class="spinner"></div>
+    <div class="spinner"></div>
 
-<p>
-
-Carregando...
-
-</p>
+    <p>Carregando...</p>
 
 </div>
 
-<!-- FIREBASE -->
+<!-- =========================
+     APP
+========================= -->
 
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
-
-<!-- JS -->
-
-<script src="js/config.js"></script>
-
-<script src="js/firebase.js"></script>
-
-<script src="js/firebase-service.js"></script>
-
-<script src="js/effects.js"></script>
-
-<script src="js/sounds.js"></script>
-
-<script src="js/raspadinha.js"></script>
-
-<script src="js/app.js"></script>
+<script type="module" src="js/app.js"></script>
 
 </body>
 
