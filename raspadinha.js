@@ -70,307 +70,59 @@ let premioRevelado = false;
 let porcentagem = 0;
 let numeroAtual = null;
 // ==========================================
-// COBERTURA PRATEADA
+// VERIFICAR NÚMERO
 // ==========================================
 
-function desenharCobertura() {
+async function verificarNumero() {
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const snap = await numeroRef.once("value");
 
-    ctx.globalCompositeOperation = "source-over";
+    if (!snap.exists()) {
 
-    // Base prata
-    ctx.fillStyle = "#BDBDBD";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        alert("Número inexistente.");
 
-    // Gradiente metálico
-    const gradiente = ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+        location.href = "cartela.html";
 
-    gradiente.addColorStop(0, "#FFFFFF");
-    gradiente.addColorStop(0.25, "#D8D8D8");
-    gradiente.addColorStop(0.50, "#B0B0B0");
-    gradiente.addColorStop(0.75, "#EAEAEA");
-    gradiente.addColorStop(1, "#FFFFFF");
-
-    ctx.fillStyle = gradiente;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Efeito de brilho
-    for (let i = 0; i < 25; i++) {
-
-        ctx.beginPath();
-
-        ctx.fillStyle = "rgba(255,255,255,.10)";
-
-        ctx.arc(
-
-            Math.random() * canvas.width,
-
-            Math.random() * canvas.height,
-
-            Math.random() * 20 + 5,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
-        ctx.fill();
+        return false;
 
     }
+
+    numeroAtual = snap.val();
+
+    if (!numeroAtual.pago) {
+
+        alert("Pagamento ainda não confirmado.");
+
+        location.href = "cartela.html";
+
+        return false;
+
+    }
+
+    if (numeroAtual.raspou) {
+
+        alert("Este número já utilizou a raspadinha.");
+
+        location.href = "cartela.html";
+
+        return false;
+
+    }
+
+    return true;
 
 }
 
 // ==========================================
-// POSIÇÃO DO MOUSE / TOQUE
+// INICIAR
 // ==========================================
 
-function obterPosicao(evento) {
+(async () => {
 
-    const rect = canvas.getBoundingClientRect();
+    const permitido = await verificarNumero();
 
-    if (evento.touches && evento.touches.length > 0) {
+    if (!permitido) return;
 
-        return {
+    desenharCobertura();
 
-            x: evento.touches[0].clientX - rect.left,
-
-            y: evento.touches[0].clientY - rect.top
-
-        };
-
-    }
-
-    return {
-
-        x: evento.clientX - rect.left,
-
-        y: evento.clientY - rect.top
-
-    };
-
-}
-
-// ==========================================
-// RASPAR
-// ==========================================
-
-function raspar(evento) {
-
-    if (!raspando) return;
-
-    if (premioRevelado) return;
-
-    evento.preventDefault();
-
-    const pos = obterPosicao(evento);
-
-    ctx.globalCompositeOperation = "destination-out";
-
-    ctx.beginPath();
-
-    ctx.arc(
-
-        pos.x,
-
-        pos.y,
-
-        CONFIG.raspadinha.raio,
-
-        0,
-
-        Math.PI * 2
-
-    );
-
-    ctx.fill();
-
-    verificarPorcentagem();
-
-         }
-// ==========================================
-// COBERTURA PRATEADA
-// ==========================================
-
-function desenharCobertura() {
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.globalCompositeOperation = "source-over";
-
-    // Base prata
-    ctx.fillStyle = "#BDBDBD";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Gradiente metálico
-    const gradiente = ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    gradiente.addColorStop(0, "#FFFFFF");
-    gradiente.addColorStop(0.25, "#D8D8D8");
-    gradiente.addColorStop(0.50, "#B0B0B0");
-    gradiente.addColorStop(0.75, "#EAEAEA");
-    gradiente.addColorStop(1, "#FFFFFF");
-
-    ctx.fillStyle = gradiente;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Efeito de brilho
-    for (let i = 0; i < 25; i++) {
-
-        ctx.beginPath();
-
-        ctx.fillStyle = "rgba(255,255,255,.10)";
-
-        ctx.arc(
-
-            Math.random() * canvas.width,
-
-            Math.random() * canvas.height,
-
-            Math.random() * 20 + 5,
-
-            0,
-
-            Math.PI * 2
-
-        );
-
-        ctx.fill();
-
-    }
-
-}
-
-// ==========================================
-// POSIÇÃO DO MOUSE / TOQUE
-// ==========================================
-
-function obterPosicao(evento) {
-
-    const rect = canvas.getBoundingClientRect();
-
-    if (evento.touches && evento.touches.length > 0) {
-
-        return {
-
-            x: evento.touches[0].clientX - rect.left,
-
-            y: evento.touches[0].clientY - rect.top
-
-        };
-
-    }
-
-    return {
-
-        x: evento.clientX - rect.left,
-
-        y: evento.clientY - rect.top
-
-    };
-
-}
-
-// ==========================================
-// RASPAR
-// ==========================================
-
-function raspar(evento) {
-
-    if (!raspando) return;
-
-    if (premioRevelado) return;
-
-    evento.preventDefault();
-
-    const pos = obterPosicao(evento);
-
-    ctx.globalCompositeOperation = "destination-out";
-
-    ctx.beginPath();
-
-    ctx.arc(
-
-        pos.x,
-
-        pos.y,
-
-        CONFIG.raspadinha.raio,
-
-        0,
-
-        Math.PI * 2
-
-    );
-
-    ctx.fill();
-
-    verificarPorcentagem();
-
-}
-// ==========================================
-// PORCENTAGEM RASPADA
-// ==========================================
-
-function verificarPorcentagem() {
-
-    const pixels = ctx.getImageData(
-
-        0,
-
-        0,
-
-        canvas.width,
-
-        canvas.height
-
-    ).data;
-
-    let transparentes = 0;
-
-    for (let i = 3; i < pixels.length; i += 4) {
-
-        if (pixels[i] === 0) {
-
-            transparentes++;
-
-        }
-
-    }
-
-    porcentagem =
-
-        transparentes /
-
-        (canvas.width * canvas.height) *
-
-        100;
-
-    if (
-
-        porcentagem >=
-
-        CONFIG.raspadinha.porcentagemRevelar &&
-
-        !premioRevelado
-
-    ) {
-
-        premioRevelado = true;
-
-        revelarPremio();
-
-    }
-
-}
+})();
