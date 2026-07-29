@@ -608,20 +608,172 @@ function perdedor(){
 // SORTEIO VIA FIREBASE
 // ==========================================
 
+// ==========================================
+// BUSCAR CONFIGURAÇÃO DA CAMPANHA
+// ==========================================
+
+async function carregarCampanha() {
+
+    const snap = await db.ref("campanha").once("value");
+
+    if (!snap.exists()) {
+
+        throw new Error("Campanha não configurada.");
+
+    }
+
+    return snap.val();
+
+}
+
+// ==========================================
+// SORTEIO VIA FIREBASE
+// ==========================================
+
 async function sortearPremioFirebase() {
 
     try {
 
-        // Incrementa o contador com segurança
+        // Incrementa o contador usando transação
         const contador = await contadorRef.transaction((dados) => {
 
             if (dados === null) {
 
-                return {
-                    total: 1
-                };
+                return { total: 1 };
 
             }
+
+            dados.total++;
+
+            return dados;
+
+        });
+
+        const total = contador.snapshot.val().total;
+
+        // Carrega campanha
+        const campanha = await carregarCampanha();
+
+        if (total > campanha.totalParticipantes) {
+
+            return {
+
+                ganhou: false,
+
+                nome: CONFIG.perdeu.nome,
+
+                imagem: CONFIG.perdeu.imagem
+
+            };
+
+        }
+
+        // Prêmios
+        const premiosSnap = await premiosRef.once("value");
+
+        const premios = premiosSnap.val();
+
+        // ============================
+        // FERRO
+        // ============================
+
+        if (
+
+            total === campanha.numeroFerro &&
+
+            premios.ferro.disponivel
+
+        ) {
+
+            await premiosRef.child("ferro").update({
+
+                disponivel: false,
+
+                numeroRifa: numeroRifa,
+
+                data: new Date().toLocaleString("pt-BR")
+
+            });
+
+            return {
+
+                ganhou: true,
+
+                nome: premios.ferro.nome,
+
+                imagem: premios.ferro.imagem,
+
+                premio: "ferro"
+
+            };
+
+        }
+
+        // ============================
+        // LIQUIDIFICADOR
+        // ============================
+
+        if (
+
+            total === campanha.numeroLiquidificador &&
+
+            premios.liquidificador.disponivel
+
+        ) {
+
+            await premiosRef.child("liquidificador").update({
+
+                disponivel: false,
+
+                numeroRifa: numeroRifa,
+
+                data: new Date().toLocaleString("pt-BR")
+
+            });
+
+            return {
+
+                ganhou: true,
+
+                nome: premios.liquidificador.nome,
+
+                imagem: premios.liquidificador.imagem,
+
+                premio: "liquidificador"
+
+            };
+
+        }
+
+        // Não ganhou
+
+        return {
+
+            ganhou: false,
+
+            nome: CONFIG.perdeu.nome,
+
+            imagem: CONFIG.perdeu.imagem
+
+        };
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        return {
+
+            ganhou: false,
+
+            nome: "Erro",
+
+            imagem: ""
+
+        };
+
+    }
+
+                   }
 
             dados.total++;
 
