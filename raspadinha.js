@@ -1,65 +1,376 @@
 /* ==========================================
    RASPADINHA.JS
    GilFest - Raspadinha Premiada
-========================================== */
+   Versão 2.0
+==========================================*/
 
 "use strict";
 
-// Canvas
+// ==========================================
+// VALIDAÇÕES
+// ==========================================
+
+if (typeof CONFIG === "undefined") {
+    throw new Error("config.js não foi carregado.");
+}
+
+if (typeof firebase === "undefined") {
+    throw new Error("firebase.js não foi carregado.");
+}
+
 const canvas = document.getElementById("raspadinha");
+
+if (!canvas) {
+    throw new Error("Canvas da raspadinha não encontrado.");
+}
 
 const ctx = canvas.getContext("2d", {
     willReadFrequently: true
 });
 
-// Tamanho
 canvas.width = CONFIG.raspadinha.largura;
 canvas.height = CONFIG.raspadinha.altura;
 
-// Estado
-let raspando = false;
-let premioAtual = null;
-let porcentagem = 0;
-let premioRevelado = false;
+// ==========================================
+// FIREBASE
+// ==========================================
 
-// Cobertura prateada
-function desenharCobertura(){
+const db = firebase.database();
 
-    ctx.globalCompositeOperation = "source-over";
+const contadorRef = db.ref("contador");
+const premiosRef = db.ref("premios");
+const participantesRef = db.ref("participantes");
+const numerosRef = db.ref("numeros");
 
-    ctx.fillStyle = "#C0C0C0";
+// ==========================================
+// NÚMERO DA RIFA
+// ==========================================
 
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+const params = new URLSearchParams(window.location.search);
 
-    // Brilho
+const numeroRifa = params.get("numero");
 
-    const gradiente =
-    ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+if (!numeroRifa) {
 
-    gradiente.addColorStop(0,"rgba(255,255,255,.5)");
-    gradiente.addColorStop(.5,"rgba(180,180,180,.2)");
-    gradiente.addColorStop(1,"rgba(255,255,255,.5)");
+    alert("Número da rifa não informado.");
 
-    ctx.fillStyle = gradiente;
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    location.href = "cartela.html";
 
 }
 
-// Inicia cobertura
-desenharCobertura();
+const numeroRef = numerosRef.child(numeroRifa);
+
+// ==========================================
+// ESTADO
+// ==========================================
+
+let raspando = false;
+let premioAtual = null;
+let premioRevelado = false;
+let porcentagem = 0;
+let numeroAtual = null;
+// ==========================================
+// COBERTURA PRATEADA
+// ==========================================
+
+function desenharCobertura() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = "source-over";
+
+    // Base prata
+    ctx.fillStyle = "#BDBDBD";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Gradiente metálico
+    const gradiente = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    gradiente.addColorStop(0, "#FFFFFF");
+    gradiente.addColorStop(0.25, "#D8D8D8");
+    gradiente.addColorStop(0.50, "#B0B0B0");
+    gradiente.addColorStop(0.75, "#EAEAEA");
+    gradiente.addColorStop(1, "#FFFFFF");
+
+    ctx.fillStyle = gradiente;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Efeito de brilho
+    for (let i = 0; i < 25; i++) {
+
+        ctx.beginPath();
+
+        ctx.fillStyle = "rgba(255,255,255,.10)";
+
+        ctx.arc(
+
+            Math.random() * canvas.width,
+
+            Math.random() * canvas.height,
+
+            Math.random() * 20 + 5,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+// ==========================================
+// POSIÇÃO DO MOUSE / TOQUE
+// ==========================================
+
+function obterPosicao(evento) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    if (evento.touches && evento.touches.length > 0) {
+
+        return {
+
+            x: evento.touches[0].clientX - rect.left,
+
+            y: evento.touches[0].clientY - rect.top
+
+        };
+
+    }
+
+    return {
+
+        x: evento.clientX - rect.left,
+
+        y: evento.clientY - rect.top
+
+    };
+
+}
+
+// ==========================================
+// RASPAR
+// ==========================================
+
+function raspar(evento) {
+
+    if (!raspando) return;
+
+    if (premioRevelado) return;
+
+    evento.preventDefault();
+
+    const pos = obterPosicao(evento);
+
+    ctx.globalCompositeOperation = "destination-out";
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        pos.x,
+
+        pos.y,
+
+        CONFIG.raspadinha.raio,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+    ctx.fill();
+
+    verificarPorcentagem();
+
+         }
+// ==========================================
+// COBERTURA PRATEADA
+// ==========================================
+
+function desenharCobertura() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = "source-over";
+
+    // Base prata
+    ctx.fillStyle = "#BDBDBD";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Gradiente metálico
+    const gradiente = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    gradiente.addColorStop(0, "#FFFFFF");
+    gradiente.addColorStop(0.25, "#D8D8D8");
+    gradiente.addColorStop(0.50, "#B0B0B0");
+    gradiente.addColorStop(0.75, "#EAEAEA");
+    gradiente.addColorStop(1, "#FFFFFF");
+
+    ctx.fillStyle = gradiente;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Efeito de brilho
+    for (let i = 0; i < 25; i++) {
+
+        ctx.beginPath();
+
+        ctx.fillStyle = "rgba(255,255,255,.10)";
+
+        ctx.arc(
+
+            Math.random() * canvas.width,
+
+            Math.random() * canvas.height,
+
+            Math.random() * 20 + 5,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+// ==========================================
+// POSIÇÃO DO MOUSE / TOQUE
+// ==========================================
+
+function obterPosicao(evento) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    if (evento.touches && evento.touches.length > 0) {
+
+        return {
+
+            x: evento.touches[0].clientX - rect.left,
+
+            y: evento.touches[0].clientY - rect.top
+
+        };
+
+    }
+
+    return {
+
+        x: evento.clientX - rect.left,
+
+        y: evento.clientY - rect.top
+
+    };
+
+}
+
+// ==========================================
+// RASPAR
+// ==========================================
+
+function raspar(evento) {
+
+    if (!raspando) return;
+
+    if (premioRevelado) return;
+
+    evento.preventDefault();
+
+    const pos = obterPosicao(evento);
+
+    ctx.globalCompositeOperation = "destination-out";
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        pos.x,
+
+        pos.y,
+
+        CONFIG.raspadinha.raio,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+    ctx.fill();
+
+    verificarPorcentagem();
+
+}
+// ==========================================
+// PORCENTAGEM RASPADA
+// ==========================================
+
+function verificarPorcentagem() {
+
+    const pixels = ctx.getImageData(
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    ).data;
+
+    let transparentes = 0;
+
+    for (let i = 3; i < pixels.length; i += 4) {
+
+        if (pixels[i] === 0) {
+
+            transparentes++;
+
+        }
+
+    }
+
+    porcentagem =
+
+        transparentes /
+
+        (canvas.width * canvas.height) *
+
+        100;
+
+    if (
+
+        porcentagem >=
+
+        CONFIG.raspadinha.porcentagemRevelar &&
+
+        !premioRevelado
+
+    ) {
+
+        premioRevelado = true;
+
+        revelarPremio();
+
+    }
+
+}
