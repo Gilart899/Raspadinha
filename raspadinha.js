@@ -126,3 +126,303 @@ async function verificarNumero() {
     desenharCobertura();
 
 })();
+
+// ==========================================
+// COBERTURA PRATEADA
+// ==========================================
+
+function desenharCobertura() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = "source-over";
+
+    // Base prata
+    ctx.fillStyle = "#BDBDBD";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Gradiente metálico
+    const gradiente = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    gradiente.addColorStop(0, "#FFFFFF");
+    gradiente.addColorStop(0.25, "#D8D8D8");
+    gradiente.addColorStop(0.50, "#B0B0B0");
+    gradiente.addColorStop(0.75, "#EAEAEA");
+    gradiente.addColorStop(1, "#FFFFFF");
+
+    ctx.fillStyle = gradiente;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Efeito de brilho
+    for (let i = 0; i < 25; i++) {
+
+        ctx.beginPath();
+
+        ctx.fillStyle = "rgba(255,255,255,.10)";
+
+        ctx.arc(
+
+            Math.random() * canvas.width,
+
+            Math.random() * canvas.height,
+
+            Math.random() * 20 + 5,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+// ==========================================
+// POSIÇÃO DO MOUSE / TOQUE
+// ==========================================
+
+function obterPosicao(evento) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    if (evento.touches && evento.touches.length > 0) {
+
+        return {
+
+            x: evento.touches[0].clientX - rect.left,
+
+            y: evento.touches[0].clientY - rect.top
+
+        };
+
+    }
+
+    return {
+
+        x: evento.clientX - rect.left,
+
+        y: evento.clientY - rect.top
+
+    };
+
+}
+
+// ==========================================
+// RASPAR
+// ==========================================
+
+function raspar(evento) {
+
+    if (!raspando) return;
+
+    if (premioRevelado) return;
+
+    evento.preventDefault();
+
+    const pos = obterPosicao(evento);
+
+    ctx.globalCompositeOperation = "destination-out";
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        pos.x,
+
+        pos.y,
+
+        CONFIG.raspadinha.raio,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+    ctx.fill();
+
+    verificarPorcentagem();
+
+}
+// ==========================================
+// PORCENTAGEM RASPADA
+// ==========================================
+
+function verificarPorcentagem() {
+
+    const pixels = ctx.getImageData(
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    ).data;
+
+    let transparentes = 0;
+
+    for (let i = 3; i < pixels.length; i += 4) {
+
+        if (pixels[i] === 0) {
+
+            transparentes++;
+
+        }
+
+    }
+
+    porcentagem =
+
+        transparentes /
+
+        (canvas.width * canvas.height) *
+
+        100;
+
+    if (
+
+        porcentagem >=
+
+        CONFIG.raspadinha.porcentagemRevelar &&
+
+        !premioRevelado
+
+    ) {
+
+        premioRevelado = true;
+
+        revelarPremio();
+
+    }
+
+       }
+// ==========================================
+// EVENTOS DO CANVAS
+// ==========================================
+
+// Mouse
+canvas.addEventListener("mousedown", () => {
+
+    if (premioRevelado) return;
+
+    raspando = true;
+
+});
+
+canvas.addEventListener("mousemove", raspar);
+
+canvas.addEventListener("mouseup", () => {
+
+    raspando = false;
+
+});
+
+canvas.addEventListener("mouseleave", () => {
+
+    raspando = false;
+
+});
+
+// Touch
+canvas.addEventListener("touchstart", (e) => {
+
+    if (premioRevelado) return;
+
+    raspando = true;
+
+    raspar(e);
+
+}, { passive:false });
+
+canvas.addEventListener("touchmove", raspar, {
+
+    passive:false
+
+});
+
+canvas.addEventListener("touchend", () => {
+
+    raspando = false;
+
+});
+
+canvas.addEventListener("touchcancel", () => {
+
+    raspando = false;
+
+});
+// ==========================================
+// BLOQUEAR NOVA RASPAGEM
+// ==========================================
+
+async function bloquearNumero() {
+
+    try {
+
+        await numeroRef.update({
+
+            raspou: true,
+
+            dataRaspagem: Date.now(),
+
+            porcentagem: Math.round(porcentagem)
+
+        });
+
+    } catch (erro) {
+
+        console.error(
+
+            "Erro ao bloquear número:",
+
+            erro
+
+        );
+
+    }
+
+}
+// ==========================================
+// NOVA RASPADINHA
+// ==========================================
+
+function novaRaspadinha() {
+
+    raspando = false;
+
+    premioAtual = null;
+
+    premioRevelado = false;
+
+    porcentagem = 0;
+
+    desenharCobertura();
+
+}
+
+const btnNova =
+
+document.getElementById("novaRaspadinha");
+
+if (btnNova) {
+
+    btnNova.addEventListener(
+
+        "click",
+
+        novaRaspadinha
+
+    );
+
+}
