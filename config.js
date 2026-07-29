@@ -6,6 +6,26 @@
 
 const CONFIG = {
 
+    firebase: {
+
+        apiKey: "...",
+
+        authDomain: "...",
+
+        databaseURL: "https://raspadinha-b8271-default-rtdb.firebaseio.com",
+
+        projectId: "...",
+
+        storageBucket: "...",
+
+        messagingSenderId: "...",
+
+        appId: "..."
+
+    }
+
+};{
+
     // ======================================
     // CAMPANHA
     // ======================================
